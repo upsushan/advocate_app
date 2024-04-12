@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "219122845130",
+    "project_id": "advocateapp-123e5",
+    "storage_bucket": "advocateapp-123e5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219122845130:android:0dbe2103eb7def8a387b33",
+        "android_client_info": {
+          "package_name": "com.aiready.advocate_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCod09qeF6nhD3nPJ1u8ZkYJR3OUL1mDjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
