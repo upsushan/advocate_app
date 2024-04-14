@@ -20,7 +20,9 @@ import "package:shared_preferences/shared_preferences.dart";
 
 class OtpVerificationScreen extends StatefulWidget {
   String fcmtoken;
-  OtpVerificationScreen({super.key,  required this.fcmtoken});
+  String mobilenumber;
+  String countrycode;
+  OtpVerificationScreen({super.key,  required this.fcmtoken, required this.mobilenumber, required this.countrycode});
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -32,6 +34,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final formKey = GlobalKey<FormState>();
   String pinVal = "";
   bool loading = false;
+  bool resendOTP = false;
 
   @override
   void dispose() {
@@ -66,6 +69,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     const focusedBorderColor = AppColors.mainBlueColor;
     const fillColor = Colors.transparent;
     const borderColor = Colors.transparent;
+
 
     final defaultPinTheme = PinTheme(
       width: 66.w,
@@ -315,35 +319,51 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         Opacity(
                           opacity: loading ? 0.5 : 1,
                           child: GradientButton(
-                              key: ValueKey("verify"),
-                              text: loading ? "Please wait..".tr(): "Verify".tr(),
+                              key: ValueKey( "verify"),
+                              text: loading ? "Please wait..".tr(): !resendOTP ? "Verify" : "Resend OTP",
                               onTap: () async{
+                                if(!resendOTP){
                                 if(!loading) {
                                   if(pinVal!=""){
                                   if (pinVal.length == 5) {
                                     setState(() {
                                       loading = true;
                                     });
-                                    bool ifVerified = await otpVerification(
-                                        pinVal, widget.fcmtoken);
+                                    String verificationResponse = await otpVerification(
+                                        pinVal,widget.mobilenumber, widget.fcmtoken, widget.countrycode);
                                     setState(() {
                                       loading = false;
                                     });
 
-                                    if (ifVerified) {
-                                      SharedPreferences prefs = await SharedPreferences
-                                          .getInstance();
-                                      prefs.setBool("loggedIn", true);
-                                      final String todayDate = DateTime.now()
-                                          .toIso8601String();
-                                      await prefs.setString(
-                                          'loggedInDate', todayDate);
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  HomePage()), (
-                                          Route<dynamic> route) => false);
+                                    if(verificationResponse!="error") {
+                                      if (verificationResponse.contains("OTP_INCORRECT")) {
+                                        Fluttertoast.showToast(
+                                            msg: "The OTP is incorrect. Please check carefully and try again");
+                                        pinController.clear();
+                                      } else if (verificationResponse.contains("SUCCESS")) {
+
+                                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                                        prefs.setBool("loggedIn", true);
+                                        final String todayDate = DateTime.now().toIso8601String();
+                                        await prefs.setString('loggedInDate', todayDate);
+                                        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomePage()), (
+                                            Route<dynamic> route) => false);
+
+                                      } else if(verificationResponse.contains("OTP_TIMEOUT")) {
+                                        Fluttertoast.showToast(msg: "The OTP has expired");
+                                        resendOTP = true;
+                                        setState(() {
+                                        });
+
+                                      }else if(verificationResponse.contains("OTP_MAX_ATTEMPTS_EXCEEDED")) {
+                                        Fluttertoast.showToast(msg: "Too many OTP attempts. Login is blocked for a day.");
+                                        Navigator.pop(context);
+                                      }
                                     }
+
+
                                   }else{
                                     Fluttertoast.showToast(msg: "OTP needs to have 5 digits");
                                   }
@@ -351,7 +371,22 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                     Fluttertoast.showToast(msg: "OTP can't be empty");
                                   }
                                 }
-                              }),
+                              }else{
+                                  setState(() {
+                                    loading = true;
+                                  });
+
+                                bool success =   await resendOTPCode(widget.mobilenumber, widget.countrycode);
+                                if(success){
+                                  resendOTP = false;
+                                }
+
+                                  setState(() {
+                                    loading = false;
+                                  });
+
+                                }
+                                }),
                         ),
 
                         SizedBox(
@@ -359,6 +394,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         ),
                         // new to advocate assit
 
+                        if(!resendOTP)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -372,13 +408,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignUpScreen(),
-                                  ),
-                                );
+                              onTap: ()async {
+                                await resendOTPCode(widget.mobilenumber, widget.countrycode);
                               },
                               child: Text(
                                 "Resend".tr(),

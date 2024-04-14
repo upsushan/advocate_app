@@ -219,42 +219,59 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onTap: () async {
                             if (!loading) {
                               if (phoneNumber.text != "" && name.text != "") {
-                                if (tokenVal == "null") {
-                                  tokenVal = (await FirebaseMessaging.instance.getToken())!;
-                                }
-                                String OS = Platform.isIOS ? "IOS" : "Android";
-                                String deviceName = "";
-                                if (Platform.isAndroid) {
-                                  var androidInfo = await DeviceInfoPlugin().androidInfo;
-                                  deviceName = "${androidInfo.manufacturer} ${androidInfo.model}";
-                                } else if (Platform.isIOS) {
-                                  var iosInfo = await DeviceInfoPlugin().iosInfo;
-                                  deviceName = "${iosInfo.utsname.sysname} ${iosInfo.systemVersion} ${iosInfo.name}";
-                                }
+                                if(phoneNumber.text.length==10) {
+                                  if (tokenVal == "null") {
+                                    tokenVal = (await FirebaseMessaging.instance
+                                        .getToken())!;
+                                  }
+                                  String OS = Platform.isIOS
+                                      ? "IOS"
+                                      : "Android";
+                                  String deviceName = "";
+                                  if (Platform.isAndroid) {
+                                    var androidInfo = await DeviceInfoPlugin()
+                                        .androidInfo;
+                                    deviceName =
+                                    "${androidInfo.manufacturer} ${androidInfo
+                                        .model}";
+                                  } else if (Platform.isIOS) {
+                                    var iosInfo = await DeviceInfoPlugin()
+                                        .iosInfo;
+                                    deviceName =
+                                    "${iosInfo.utsname.sysname} ${iosInfo
+                                        .systemVersion} ${iosInfo.name}";
+                                  }
 
-                                setState(() {
-                                  loading = true;
-                                });
-                                bool success = await signupUser(
-                                  phoneNumber.text,
-                                  name.text,
-                                  countryCode,
-                                  deviceName,
-                                  OS,
-                                  tokenVal,
-                                );
-
-                                setState(() {
-                                  loading = false;
-                                });
-
-                                if (success) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => OtpVerificationScreen(fcmtoken: tokenVal),
-                                    ),
+                                  setState(() {
+                                    loading = true;
+                                  });
+                                  bool success = await signupUser(
+                                    phoneNumber.text,
+                                    name.text,
+                                    countryCode,
+                                    deviceName,
+                                    OS,
+                                    tokenVal,
                                   );
+
+                                  setState(() {
+                                    loading = false;
+                                  });
+
+                                  if (success) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            OtpVerificationScreen(
+                                              fcmtoken: tokenVal,
+                                              mobilenumber: phoneNumber.text,
+                                              countrycode: countryCode,),
+                                      ),
+                                    );
+                                  }
+                                }else{
+                                  Fluttertoast.showToast(msg: "The number needs to have 10 digits, please enter again.");
                                 }
                               } else {
                                 Fluttertoast.showToast(msg: "Name / Number can't be empty");

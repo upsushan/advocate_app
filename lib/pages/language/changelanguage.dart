@@ -1,13 +1,17 @@
+import 'package:advocate_app/apis/apis.dart';
 import 'package:advocate_app/utils/colors.dart';
 import 'package:advocate_app/utils/textStyle.dart';
 import 'package:advocate_app/widgets/buttons.dart';
+import 'package:advocate_app/wrapper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -20,7 +24,6 @@ class ChangeLanguage extends StatefulWidget {
 
 class _ChangeLanguageState extends State<ChangeLanguage> {
   final Uri _privacyUrl = Uri.parse('https://google.com/');
-
   final Uri _rateUrl = Uri.parse('https://google.com/');
 
   List<String> languageItems = [
@@ -433,7 +436,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Perform delete account action
+                delete_account();
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text(
@@ -458,6 +461,23 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   Future<void> _launchUrlRate() async {
     if (!await launchUrl(_rateUrl)) {
       throw Exception('Could not launch $_rateUrl');
+    }
+  }
+
+
+  delete_account()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token =  prefs.getString("sessionToken");
+    if(token!=null) {
+      bool loggedOut = await deleteAccount(token);
+      if(loggedOut){
+        prefs.remove("sessionToken");
+        prefs.remove("loggedIn");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Wrapper()));
+        Fluttertoast.showToast(msg: "Account Deleted Successfully");
+      }else{
+        Fluttertoast.showToast(msg: "Sorry, there was an issue. Please try again later.");
+      }
     }
   }
 }

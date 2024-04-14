@@ -220,17 +220,20 @@ class _SignInScreenState extends State<SignInScreen> {
                                     loggingIn = false;
                                   });
                                   if (success) {
+                                    String number = phoneNumber.text;
                                     phoneNumber.text = "";
                                     setState(() {});
+
 
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             OtpVerificationScreen(
-                                                fcmtoken: tokenVal),
+                                                fcmtoken: tokenVal, mobilenumber: number, countrycode: countryCode,),
                                       ),
                                     );
+
                                   }
                                 }else{
                                   Fluttertoast.showToast(msg: "The number needs to have 10 digits, please enter again");

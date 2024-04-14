@@ -1,3 +1,4 @@
+import 'package:advocate_app/apis/apis.dart';
 import 'package:advocate_app/pages/home.dart';
 import 'package:advocate_app/pages/home/homepage.dart';
 import 'package:advocate_app/utils/colors.dart';
@@ -5,13 +6,16 @@ import 'package:advocate_app/utils/icons.dart';
 import 'package:advocate_app/utils/textStyle.dart';
 import 'package:advocate_app/widgets/buttons.dart';
 import 'package:advocate_app/widgets/textField.dart';
+import 'package:advocate_app/wrapper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -22,6 +26,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   String? _selectedBarCouncil;
+
+  TextEditingController email = TextEditingController();
+  TextEditingController lawyerRegistrationNumber = TextEditingController();
+  TextEditingController lawFirmOrganization = TextEditingController();
+  TextEditingController location = TextEditingController();
+  TextEditingController yearsOfExperience = TextEditingController();
 
   List<String> councilItems = [
     'Select Bar Council Affiliated To :'.tr(),
@@ -105,12 +115,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool registred =false;
 
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController registrationNumberController = TextEditingController();
-  final TextEditingController lawFirmController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController experienceController = TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +174,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w500,
                   ),
+                  controller: email,
                   decoration:
                   AppTextFieldStyle.textFieldStyle('Enter email address'.tr()),
                 ),
@@ -190,6 +195,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),
+                  controller: lawyerRegistrationNumber,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
                   decoration: AppTextFieldStyle.textFieldStyle(
                       'Enter Lawyer Registration Number'.tr()),
                 ),
@@ -210,6 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w500,
                   ),
+                  controller: lawFirmOrganization,
                   decoration: AppTextFieldStyle.textFieldStyle(
                       'Enter Law Firm/Organization '.tr()),
                 ),
@@ -231,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: Color(0xFFF9FAFB),
                   shape: RoundedRectangleBorder(
                     side: BorderSide(
-                        width: 1.w, color: AppColors.textSecondaryBlack),
+                        width: 1.w, color: AppColors.textMainBlack),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
@@ -283,7 +291,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: Color(0xFFF9FAFB),
                     shape: RoundedRectangleBorder(
                       side: BorderSide(
-                          width: 1.w, color: AppColors.textSecondaryBlack),
+                          width: 1.w, color: AppColors.textMainBlack),
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                   ),
@@ -330,6 +338,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w500,
                   ),
+                  controller: location,
                   decoration:
                   AppTextFieldStyle.textFieldStyle('Enter Location'.tr()),
                 ),
@@ -351,7 +360,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: Color(0xFFF9FAFB),
                   shape: RoundedRectangleBorder(
                     side: BorderSide(
-                        width: 1.w, color: AppColors.textSecondaryBlack),
+                        width: 1.w, color: AppColors.textMainBlack),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
@@ -385,7 +394,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
 
 // select your expertise
-
             SizedBox(
               height: 10.h,
             ),
@@ -399,7 +407,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: Color(0xFFF9FAFB),
                   shape: RoundedRectangleBorder(
                     side: BorderSide(
-                        width: 1.w, color: AppColors.textSecondaryBlack),
+                        width: 1.w, color: AppColors.textMainBlack),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
@@ -446,6 +454,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w500,
                   ),
+                  controller: yearsOfExperience,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
                   decoration: AppTextFieldStyle.textFieldStyle(
                       'Enter years of experience'.tr()),
                 ),
@@ -467,7 +477,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: Color(0xFFF9FAFB),
                   shape: RoundedRectangleBorder(
                     side: BorderSide(
-                        width: 1.w, color: AppColors.textSecondaryBlack),
+                        width: 1.w, color: AppColors.textMainBlack),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
@@ -509,9 +519,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: GradientButton(
                   key: ValueKey('submit'),
                   text: 'Submit'.tr(),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Home()));
+                  onTap: ()async {
+
+
+
+                   if(email.text!="" && lawyerRegistrationNumber.text!="" && lawFirmOrganization.text!="" && location.text!="" && yearsOfExperience.text!=""){
+                     if(areyouregistered_firstVal != areyouregistered && selectedAreaItem_firstVal!= selectedAreaItem  && selectedExpertiseItem!=selectedExpertiseItem_firstVal && selectedLanguageItem_firstVal!=selectedLanguageItem){
+                       String token = await sessionToken();
+                       bool registered = await registerUser(token, email.text, lawyerRegistrationNumber.text, areyouregistered!, lawFirmOrganization.text, location.text, selectedAreaItem!, selectedExpertiseItem!, yearsOfExperience.text, selectedLanguageItem!);
+
+                       if(registered){
+                         Fluttertoast.showToast(msg: "Registered Successfully");
+                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Wrapper()));
+                       }else{
+                         Fluttertoast.showToast(msg: "Sorry there was an issue");
+                       }
+
+
+                     }else{
+                       Fluttertoast.showToast(msg: "Please select from all selection fields before Registering");
+                     }
+
+                   }else{
+                     Fluttertoast.showToast(msg: "Please enter all details before Registering");
+                   }
+
                   }),
             ),
             SizedBox(
@@ -522,4 +554,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
+
+ Future<String> sessionToken()async{
+   SharedPreferences prefs = await SharedPreferences.getInstance();
+   String? token =  prefs.getString("sessionToken");
+   return token!;
+ }
 }

@@ -1,3 +1,4 @@
+import 'package:advocate_app/apis/apis.dart';
 import 'package:advocate_app/pages/chats/chatscreen.dart';
 import 'package:advocate_app/pages/chats/chatspage.dart';
 import 'package:advocate_app/pages/language/changelanguage.dart';
@@ -5,6 +6,7 @@ import 'package:advocate_app/pages/onboarding/onboardingscreen.dart';
 import 'package:advocate_app/utils/colors.dart';
 import 'package:advocate_app/utils/icons.dart';
 import 'package:advocate_app/utils/textStyle.dart';
+import 'package:advocate_app/wrapper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +28,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool showNavMenu = false;
   int _pressedCount = 0;
+  bool sessionChecked = false;
+
+  validateSession()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token =  prefs.getString("sessionToken");
+    print("Session token $token");
+    if(token!=null) {
+      bool session = await checkIfSessionisValid(token);
+      if(!session){
+        prefs.remove("sessionToken");
+        prefs.remove("loggedIn");
+        Fluttertoast.showToast(msg: "Login session has expired. Please log in again.");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Wrapper()));
+      }else{
+      }
+    }
+  }
+
+  sessionLogout()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token =  prefs.getString("sessionToken");
+    if(token!=null) {
+      bool loggedOut = await logoutFromSession(token);
+      if(loggedOut){
+        prefs.remove("sessionToken");
+        prefs.remove("loggedIn");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Wrapper()));
+        Fluttertoast.showToast(msg: "Logged out successfully");
+      }else{
+        Fluttertoast.showToast(msg: "Sorry, there was an issue. Please try again later.");
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
+
+    if(!sessionChecked) {
+      validateSession();
+      sessionChecked = true;
+    }
+
     return SafeArea(
       child: WillPopScope(
         onWillPop: () async {
@@ -326,9 +369,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 GestureDetector(
                                   onTap: () async {
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    prefs.setBool('loggedin', false);
-                                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => OnboardingScreen()), (Route<dynamic> route) => false);
+                                          await sessionLogout();
+
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,

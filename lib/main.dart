@@ -5,6 +5,7 @@ import 'package:advocate_app/auth/signin.dart';
 import 'package:advocate_app/pages/home.dart';
 import 'package:advocate_app/pages/home/homepage.dart';
 import 'package:advocate_app/pages/onboarding/onboardingscreen.dart';
+import 'package:advocate_app/pages/register/register.dart';
 import 'package:advocate_app/wrapper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
