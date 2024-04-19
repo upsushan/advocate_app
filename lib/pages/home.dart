@@ -1,6 +1,6 @@
-import 'package:advocate_app/pages/chats/chatspage.dart';
+import 'package:advocate_app/pages/chats/chat_history_screen.dart';
 import 'package:advocate_app/pages/home/homepage.dart';
-import 'package:advocate_app/pages/language/changelanguage.dart';
+import 'package:advocate_app/pages/language/settingsScreen.dart';
 import 'package:advocate_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +19,8 @@ class _HomeState extends State<Home> {
 
   static List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    ChatsPage(),
-    ChangeLanguage(),
+    ChatsHistory(),
+    settingsScreen(),
   ];
 
   void _onItemTapped(int index) {

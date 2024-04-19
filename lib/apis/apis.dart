@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'package:advocate_app/models/chat_class.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 final dio = Dio();
 String host_url = "https://helical-ranger-419111.el.r.appspot.com";
-
 
 //login endpoint /user/login
 Future<bool> loginUser(String number, String countrycode, String devicenumber, String os, String fcmtoken) async {
@@ -247,8 +249,6 @@ Future<bool> registerUser(String token, String email, String registration_number
 
 
 
-
-
 //logout endpoint /user/logout
 Future<bool> logoutFromSession(String token) async {
  try {
@@ -335,7 +335,145 @@ Future<bool>  signupUser(String number, String name, String countrycode, String 
 
 
 
+//chat endpoint /user/chat
+Future<ApiResponse?> chat(bool newchat, int? chatid,   String messagetype, String content) async {
+ String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss.SSSSSS').format(DateTime.now());
+
+ String token = await getToken();
+ final Map<String, dynamic> payload = {
+  "id": 0,
+  "sender": "user",
+  "chatId": chatid,
+  "timestamp": formattedDateTime,
+  "type": messagetype,
+  "contextMessageId": null,
+  "content": content
+ };
+
+ try {
+  Response response = await dio.post(
+   host_url + '/chat',
+   data: payload,
+   options: Options(
+    headers: {
+     'sessionToken': token,
+     'Content-Type': 'application/json',
+    },
+    validateStatus: (status) {
+     return (status != null && status < 500); // Accept any status less than 500
+    },
+   ),
+  );
+
+  if (response.statusCode == 200) {
+
+   var jsonObject = json.encode(response.data);
+
+   Map<String, dynamic> decodedJson = jsonDecode(jsonObject.toString());
+
+
+   print(decodedJson);
+  // Clipboard.setData( ClipboardData(text: decodedJson.toString()));
+
+   return ApiResponse.fromJson(decodedJson);
+  }else{
+   return null;
+   }
+ }catch (e) {
+  return null;
+ }
+}
+
+
+
+//chat endpoint /user/sync-all-chats
+Future<bool> chatSync() async {
+
+ String token = await getToken();
+ final Map<String, dynamic> payload = {
+  "chatList": [
+   {
+    "chatId": 0,
+    "messageId": 0
+   }
+  ]
+ };
+
+ try {
+  Response response = await dio.post(
+   host_url + '/chat/sync-all-chats',
+   data: payload,
+   options: Options(
+    headers: {
+     'sessionToken': token,
+     'Content-Type': 'application/json',
+    },
+    validateStatus: (status) {
+     return (status != null && status < 500); // Accept any status less than 500
+    },
+   ),
+  );
+
+  if (response.statusCode == 200) {
+
+   var jsonObject = json.encode(response.data);
+   print(jsonObject);
+
+   Map<String, dynamic> decodedJson = jsonDecode(jsonObject.toString());
+
+   SharedPreferences prefs = await SharedPreferences.getInstance();
+   await prefs.setString('chat-history', jsonEncode(decodedJson));
+
+   return true;
+  }else{
+   return false;
+  }
+ }catch (e) {
+  return false;
+ }
+}
+
+
+
+Future<String> getToken() async {
+ SharedPreferences prefs = await SharedPreferences.getInstance();
+ String? token = prefs.getString("sessionToken");
+ return token!;
+}
+
 String getErrorMessage(dynamic val) {
  Map<String, dynamic> errorDetails = val;
  return errorDetails['error']; // ✅ Correctly returning a String
 }
+
+
+
+String formatToJson(String input) {
+ // Correctly quote keys that are not already quoted
+ String withQuotedKeys = input.replaceAllMapped(
+     RegExp(r'(?<!")(\b\w+\b)(?!")(?=:)'),
+         (match) => '"${match[1]}"'
+ );
+
+ // Ensure all values are properly quoted, except for timestamp values
+ String withProperlyQuotedValues = withQuotedKeys.replaceAllMapped(
+     RegExp(r'(?<=:\s*)(?!"|\d)(.*?)(?=[,}])'),
+         (match) {
+      var str = match[1];
+      if (!str!.contains(new RegExp(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}'))) { // Check if it's not a timestamp
+       str = str.replaceAll('"', r'\"'); // Escape internal quotes
+       return '"$str"'; // Enclose in quotes
+      }
+      return str; // Return timestamp as is
+     }
+ );
+
+ // Handle non-string numeric values and Booleans by ensuring they are not quoted
+ withProperlyQuotedValues = withProperlyQuotedValues.replaceAllMapped(
+     RegExp(r'"\s*(\d+|\d+\.\d+|true|false)\s*"'),
+         (match) => match[1]!
+ );
+
+ return withProperlyQuotedValues;
+}
+

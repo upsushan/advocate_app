@@ -49,6 +49,10 @@ dependencies:
   firebase_core: ^2.28.0
   fluttertoast:
   easy_localization:
+  speech_to_text:
+  intl:
+  docx_template:
+  path_provider:
 
 
 dev_dependencies:

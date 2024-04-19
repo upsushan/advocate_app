@@ -15,14 +15,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
-class ChangeLanguage extends StatefulWidget {
-  const ChangeLanguage({super.key});
+class settingsScreen extends StatefulWidget {
+  const settingsScreen({super.key});
 
   @override
-  State<ChangeLanguage> createState() => _ChangeLanguageState();
+  State<settingsScreen> createState() => _settingsScreenState();
 }
 
-class _ChangeLanguageState extends State<ChangeLanguage> {
+class _settingsScreenState extends State<settingsScreen> {
   final Uri _privacyUrl = Uri.parse('https://google.com/');
   final Uri _rateUrl = Uri.parse('https://google.com/');
 
@@ -103,7 +103,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
                   Text(
                     'Change Language'.tr(),
-                    style: AppTextStyles.subHeadingStyle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22.sp,
+                      color: AppColors.textMainBlack.withOpacity(0.7),
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   SizedBox(height: 5,),
                   Container(
@@ -132,9 +136,9 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                           child: Text(
                             item,
                             style: GoogleFonts.poppins(
-                              color: AppColors.textMainBlack,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 20.sp,
+                              color: AppColors.textMainBlack.withOpacity(0.5),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ))
@@ -166,7 +170,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                     children: [
                       Text(
                         'Share the Joy!'.tr(),
-                        style: AppTextStyles.subHeadingStyle,
+                        style: GoogleFonts.poppins(
+                          fontSize: 22.sp,
+                          color: AppColors.textMainBlack.withOpacity(0.7),
+                          fontWeight: FontWeight.w800,
+                        ),
                       )
                     ],
                   ),
@@ -189,9 +197,10 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                         ),
                         Text(
                           'Invite Friends'.tr(),
-                          style: AppTextStyles.labelStyle.copyWith(
-                            fontSize: 18,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20.sp,
                             color: AppColors.textMainBlack.withOpacity(0.5),
+                            fontWeight: FontWeight.w600,
                           ),
                         )
                       ],
@@ -230,10 +239,10 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                         ),
                         Text(
                           'Rate App'.tr(),
-                          style: AppTextStyles.labelStyle.copyWith(
-                            fontSize: 18,
-
+                          style: GoogleFonts.poppins(
+                            fontSize: 20.sp,
                             color: AppColors.textMainBlack.withOpacity(0.5),
+                            fontWeight: FontWeight.w600,
                           ),
                         )
                       ],
@@ -267,7 +276,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                       Text(
                         'Help and Support'.tr(),
 
-                        style: AppTextStyles.subHeadingStyle,
+                        style: GoogleFonts.poppins(
+                          fontSize: 22.sp,
+                          color: AppColors.textMainBlack.withOpacity(0.7),
+                          fontWeight: FontWeight.w800,
+                        ),
                       )
                     ],
                   ),
@@ -290,10 +303,10 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                         ),
                         Text(
                           'Contact Us'.tr(),
-                          style: AppTextStyles.labelStyle.copyWith(
-                            fontSize: 18,
-
+                          style: GoogleFonts.poppins(
+                            fontSize: 20.sp,
                             color: AppColors.textMainBlack.withOpacity(0.5),
+                            fontWeight: FontWeight.w600,
                           ),
                         )
                       ],
@@ -332,9 +345,10 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                         ),
                         Text(
                           'Privacy Policy'.tr(),
-                          style: AppTextStyles.labelStyle.copyWith(
-                            fontSize: 18,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20.sp,
                             color: AppColors.textMainBlack.withOpacity(0.5),
+                            fontWeight: FontWeight.w600,
                           ),
                         )
                       ],
@@ -367,7 +381,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                     children: [
                       Text(
                         'Account Settings'.tr(),
-                        style: AppTextStyles.subHeadingStyle,
+                        style: GoogleFonts.poppins(
+                          fontSize: 22.sp,
+                          color: AppColors.textMainBlack.withOpacity(0.7),
+                          fontWeight: FontWeight.w800,
+                        ),
                       )
                     ],
                   ),
@@ -380,19 +398,16 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                     },
                     child: Row(
                       children: [
-                        SvgPicture.asset(
-                          "assets/icons/delete.svg",
-                          height: 28.h,
-                          color: AppColors.mainBlueColor.withOpacity(0.8),
-                        ),
+                       Icon(Icons.delete_rounded, color: AppColors.mainBlueColor.withOpacity(0.85),),
                         SizedBox(
                           width: 15.w,
                         ),
                         Text(
                           'Delete Account'.tr(),
-                          style: AppTextStyles.labelStyle.copyWith(
-                            fontSize: 18,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20.sp,
                             color: AppColors.textMainBlack.withOpacity(0.5),
+                            fontWeight: FontWeight.w600,
                           ),
                         )
                       ],

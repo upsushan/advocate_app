@@ -35,6 +35,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late SharedPreferences prefs;
   String tokenVal = "";
   bool loading = false;
+  bool _yesChecked = false;
+  bool _noChecked = false;
 
   @override
   void initState() {
@@ -201,9 +203,102 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
 
+                // login butto
+                SizedBox(
+                  height: 35.h,
+                ),
+
+// Are you a lawyer
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Row(
+                    children: [
+                      Text("Are you a lawyer?".tr(), style: AppTextStyles.labelStyle)
+                    ],
+                  ),
+                ),
+
+                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+
+                    child: Row(
+
+                      children: [
+                        Checkbox(
+                          value: _yesChecked,
+                          onChanged: (value) {
+                            setState(() {
+                              _yesChecked = value!;
+                              if (value) {
+                                _noChecked = false;
+                              }
+                            });
+                          },
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6).r),
+                          activeColor: AppColors.mainBlueColor,
+                          checkColor: Colors.white,
+                          side: BorderSide(
+                            color: AppColors.textSecondaryBlack,
+                            width: 1.w,
+                            strokeAlign: BorderSide.strokeAlignInside,
+                          ),
+                        ),
+                        Text(
+                          "Yes".tr(),
+                          style: GoogleFonts.poppins(
+                            color: Color(0xFF1D2939),
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _noChecked,
+                              onChanged: (value) {
+                                setState(() {
+                                  _noChecked = value!;
+                                  if (value) {
+                                    _yesChecked = false;
+                                  }
+                                });
+                              },
+                              materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6).r),
+                              activeColor: AppColors.mainBlueColor,
+                              checkColor: Colors.white,
+                              side: BorderSide(
+                                color: AppColors.textSecondaryBlack,
+                                width: 1.w,
+                                strokeAlign: BorderSide.strokeAlignInside,
+                              ),
+                            ),
+                            Text(
+                              "No".tr(),
+                              style: GoogleFonts.poppins(
+                                color: Color(0xFF1D2939),
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ]),
+
+
+
                 // login button
                 SizedBox(
-                  height: 50.h,
+                  height: 20.h,
                 ),
 
                 Padding(
